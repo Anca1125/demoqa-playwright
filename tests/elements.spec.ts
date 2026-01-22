@@ -1,4 +1,5 @@
 import {test, expect} from '@playwright/test'
+import path from 'path'
 
 test.describe('elements section', ()=>{
 
@@ -212,4 +213,79 @@ test('links - created return 201', async({page, context}) => {
 await expect(page.locator('#linkResponse')).toContainText('Created')
 })
 
+test('broken links - valid image is displayed', async({page, context}) => {
+ await page.getByText('Broken Links - Images').click()
+ await expect(page).toHaveURL('https://demoqa.com/broken')
+const validImage= page.locator('img').first()
+ await expect(validImage).toBeVisible()
+})
+
+test('broken links - broken image', async({page, context}) => {
+ await page.getByText('Broken Links - Images').click()
+ await expect(page).toHaveURL('https://demoqa.com/broken')
+const brokenImage= page.locator('img').nth(1)
+ await expect(brokenImage).toBeVisible()
+})
+
+test('broken links - valid link', async({page, context, request}) => {
+ await page.getByText('Broken Links - Images').click()
+ await expect(page).toHaveURL('https://demoqa.com/broken')
+
+ const validLink = page.getByText('Click Here for Valid Link')
+ const href = await validLink.getAttribute('href')
+ const response = await request.get(href!)
+ expect(response.status()).toBe(200)
+ })
+
+ test('broken links - broken link', async({page, context, request}) => {
+ await page.getByText('Broken Links - Images').click()
+ await expect(page).toHaveURL('https://demoqa.com/broken')
+
+ const brokenLink = page.getByText('Click Here for Broken Link')
+ const href = await brokenLink.getAttribute('href')
+ const response = await request.get(href!)
+ expect(response.status()).toBe(500)
+ })
+
+ test('upload and download - download', async({page, context, request}) => {
+ await page.getByText('Upload and Download').click()
+ await expect(page).toHaveURL('https://demoqa.com/upload-download')
+
+ const downloadPromise = page.waitForEvent('download')
+
+await page.getByRole('link', { name: 'Download' }).click()
+
+const downlod = await downloadPromise
+
+expect(downlod.suggestedFilename()).toBeTruthy
+ })
+
+  test('upload and download - upload', async({page, context, request}) => {
+ await page.getByText('Upload and Download').click()
+ await expect(page).toHaveURL('https://demoqa.com/upload-download')
+ await page.getByLabel('Select a file').setInputFiles(path.join(__dirname,'resources', 'test-file.txt'))
+ const filePath = (path.join(__dirname,'resources', 'test-file.txt'))
+  await page.setInputFiles('#uploadFile', filePath)
+  await expect(page.locator('#uploadedFilePath')).toContainText('test-file.txt')
+})
+
+test('dynamic properties - enable button ', async({page, context, request}) => {
+ await page.getByText('Dynamic Properties').click()
+ await expect(page).toHaveURL('https://demoqa.com/dynamic-properties')
+const enableButton = await page.locator('#enableAfter')
+await expect(enableButton).toBeEnabled()
+})
+test('dynamic properties - change color ', async({page, context, request}) => {
+ await page.getByText('Dynamic Properties').click()
+ await expect(page).toHaveURL('https://demoqa.com/dynamic-properties')
+const colorButton = await page.locator('#colorChange')
+await expect(colorButton).toHaveClass(/text-danger/);
+})
+
+test('dynamic properties - button becomes visible ', async({page, context, request}) => {
+ await page.getByText('Dynamic Properties').click()
+ await expect(page).toHaveURL('https://demoqa.com/dynamic-properties')
+const visibleButton = await page.locator('#visibleAfter')
+await expect(visibleButton).toBeVisible()
+})
 })
