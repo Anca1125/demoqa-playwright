@@ -129,12 +129,64 @@ test('alerts - promt alert with message', async ({page})=>{
 page.locator('#promtButton').click()]);
 await expect (page.locator('#promptResult')).toContainText('Hello Anca!')
 });
-test('alerts, frames & windows - frame', async ({page})=> {
+test('frames - verify text in frame1', async ({page})=> {
   await page.getByText('Frames', {exact:true}).click()
   await expect(page).toHaveURL('https://demoqa.com/frames')
   
  const frame = page.locator('#frame1')
  await expect(frame.getByText('This is a sample page')).toBeVisible()
+})
+
+test('frames - verify text in frame2', async ({page})=> {
+  await page.getByText('Frames', {exact:true}).click()
+  await expect(page).toHaveURL('https://demoqa.com/frames')
+  
+ const frame2 = page.frameLocator('#frame2')
+ await expect(frame2.getByText('This is a sample page')).toBeVisible()
+})
+
+test('frames - verify parent frame', async ({page})=> {
+  await page.getByText('Nested Frames').click()
+  await expect(page).toHaveURL('https://demoqa.com/nestedframes')
+  
+  const frameParent = page.frameLocator('#frame1')
+ await expect(frameParent.getByText('Parent Frame')).toBeVisible()
+})
+
+test('frames - verify child frame', async ({page})=> {
+  await page.getByText('Nested Frames').click()
+  await expect(page).toHaveURL('https://demoqa.com/nestedframes')
+
+  const frameParent = page.frameLocator('#frame1')
+  const frameChild = frameParent.frameLocator('iframe')
+
+ await expect(frameChild.getByText('Child Iframe')).toBeVisible()
+})
+test('Alerts - verify small modal', async ({ page }) => {
+    await page.getByText('Modal Dialogs').click();
+    await expect(page).toHaveURL('https://demoqa.com/modal-dialogs');
+    await page.getByText('Small Modal').click()
+
+    const smallModal = page.locator('#example-modal-sizes-title-sm')
+    const closeButton = page.locator('#closeSmallModal')
+
+    await expect(smallModal).toBeVisible()
+    await closeButton.click()
+   await expect(smallModal).not.toBeVisible()
+    
+})
+test(' modals - verify large modal ', async ({page})=> {
+  await page.getByText('Modal Dialogs').click()
+  await expect(page).toHaveURL('https://demoqa.com/modal-dialogs')
+
+  const largeModal = page.locator('#example-modal-sizes-title-lg')
+  const closeLargeButton = page.locator('#closeLargeModal')
+
+  await page.getByText('Large Modal').click()
+  await expect(largeModal).toBeVisible()
+  await closeLargeButton.click()
+  await expect(largeModal).not.toBeVisible()
+
 })
 
 })
