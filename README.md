@@ -123,6 +123,7 @@ npm install
 ```
 
 2. Run Playwright tests
+   
    npx playwright test
 
 > Make sure Node.js is installed before running the commands above.
