@@ -1,10 +1,24 @@
 # DemoQA Automation Project (Playwright)
 
-This repository contains automated UI tests written in **Playwright with TypeScript**  
+This repository contains UI automation tests written in **Playwright with TypeScript**
 for the public practice website [DemoQA](https://demoqa.com/).
 
-The project is part of my learning journey in **QA Automation** and reflects
-both successful implementations and real debugging challenges encountered along the way.
+This project is part of my learning journey as a **Junior QA Automation Engineer**.
+It includes both working tests and examples of real challenges encountered while learning
+UI automation (timeouts, dynamic elements, iframes, CI failures).
+
+---
+
+## 🎯 Purpose of the Project
+
+The main goal of this project is to:
+
+- practice UI test automation using Playwright
+- understand how to structure test files
+- learn how locators, assertions, and waits work in real scenarios
+- observe how tests behave when running in CI (GitHub Actions)
+
+This is a **learning project**, not a production-ready automation suite.
 
 ---
 
@@ -13,13 +27,14 @@ both successful implementations and real debugging challenges encountered along 
 - Playwright
 - TypeScript
 - Node.js
-- Git & GitHub
+- Git
+- GitHub & GitHub Actions
 
 ---
 
 ## 🧪 Tested Sections
 
-### ✅ Elements
+### Elements
 
 - Text Box
 - Check Box
@@ -31,9 +46,9 @@ both successful implementations and real debugging challenges encountered along 
 - Upload & Download
 - Dynamic Properties
 
-### ✅ Forms
+### Forms
 
-- Practice Form
+- Practice Form:
   - Text inputs (First Name, Last Name, Email, Phone)
   - Radio buttons (Gender)
   - Checkboxes (Hobbies)
@@ -43,18 +58,59 @@ both successful implementations and real debugging challenges encountered along 
   - Form submission
   - Modal validation after submit
 
+### Alerts, Frames & Windows
+
+- Browser Windows
+- Alerts
+- Frames
+- Nested Frames
+- Modal Dialogs
+
+### Widgets
+
+- Accordian
+- Auto Complete
+- Date Picker
+- Slider
+- Progress Bar
+- Tabs
+- Tool Tips
+- Menu
+- Select Menu
+
+### Interactions
+
+- Sortable
+- Selectable
+- Resizable
+- Droppable
+- Draggable
+
+### Book Store Application
+
+- Login
+- Book Store
+- Profile
+- Basic API interaction
+
 ---
 
-## 🧠 Notes About the Project
+## 🧠 Notes & Learning Observations
 
-- Tests are intentionally written in a **beginner-friendly and explicit style**
-  to reflect my learning process.
-- Some alternative solutions and commented code are kept to show
-  exploration, trial-and-error, and debugging.
-- Certain interactions (e.g. State & City selection) use `force: true`
-  due to known UI overlays (ads) present on the DemoQA website.
-- The focus of the project is **understanding Playwright syntax, locators,
-  assertions, and real-world UI issues**, not just passing tests.
+- Tests are written in a **clear and explicit style** to reflect my learning process.
+- Some tests may appear verbose on purpose, to make the logic easier to follow.
+- Certain solutions include workarounds (e.g. `force: true`) due to UI limitations
+  on the DemoQA website (ads, overlays, dynamic rendering).
+- Some tests may fail intermittently in CI because:
+  - DemoQA is not a stable test environment
+  - elements load differently across browsers
+  - iframe content may load with delays
+
+These cases are intentionally kept to better understand:
+
+- flaky tests
+- CI failures
+- test stability strategies
 
 ---
 
@@ -65,3 +121,8 @@ both successful implementations and real debugging challenges encountered along 
 ```bash
 npm install
 ```
+
+2. Run Playwright tests
+   npx playwright test
+
+> Make sure Node.js is installed before running the commands above.
