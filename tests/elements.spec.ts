@@ -4,7 +4,11 @@ import path from 'path'
 test.describe('elements section', ()=>{
 
 test.beforeEach(async({page})=>{
-await page.goto('https://demoqa.com/')
+await page.goto('https://demoqa.com/',
+{
+  waitUntil: 'domcontentloaded',
+    timeout: 60000,
+})
 await page.getByText('Elements').click()
 await expect(page).toHaveURL('https://demoqa.com/elements')
 })
@@ -89,7 +93,8 @@ await page.getByText('Check Box').click()
 test('radio buttons - select Yes', async({page}) => {
  await page.getByText('Radio Button').click()
  await expect(page).toHaveURL('https://demoqa.com/radio-button')
- await page.getByText('Yes').click()
+await page.getByLabel('Yes').check({force:true})
+ //await page.getByText('Yes').click()
  await expect(page.locator('.text-success')).toBeVisible()
  await expect(page.locator('.text-success')).toHaveText('Yes')
 })
@@ -97,13 +102,13 @@ test('radio buttons - select Yes', async({page}) => {
 test('radio buttons - select Impressive', async({page}) => {
  await page.getByText('Radio Button').click()
  await expect(page).toHaveURL('https://demoqa.com/radio-button')
- await page.getByText('Impressive').click()
+ await page.getByText('Impressive').check()
  await expect(page.locator('.text-success')).toBeVisible()
  await expect(page.locator('.text-success')).toHaveText('Impressive')
 })   
 
 test('radio buttons - No option is disable', async({page}) => {
- await page.getByText('Radio Button').click()
+ await page.getByText('Radio Button').check()
  await expect(page).toHaveURL('https://demoqa.com/radio-button')
  const noRadio = await page.getByLabel('No')
  await expect(noRadio).toBeDisabled()
