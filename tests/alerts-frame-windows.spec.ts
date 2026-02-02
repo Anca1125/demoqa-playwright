@@ -1,199 +1,206 @@
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test'
+import { NavigationPage } from '../pages/NavigationPage'
+import { BrowserWindowsPage} from '../pages/AlertsFramesWindows/BrowserWindowsPage'
+import { AlertsPage } from '../pages/AlertsFramesWindows/AlertsPage'
+import {FramesPage} from '../pages/AlertsFramesWindows/FramesPage'
+import { NestedFramesPage } from '../pages/AlertsFramesWindows/NestedFramesPage'
+import { ModalDialogsPage } from '../pages/AlertsFramesWindows/ModalDialogs'
 
 test.describe('Alerts, Frame & Windows', () => {
 
   test.beforeEach(async({page})=>{
-await page.goto('https://demoqa.com/',
-{
-  waitUntil: 'domcontentloaded',
-    timeout: 60000,
+
+const navigation =new NavigationPage(page)
+
+await navigation.openDemoQa()
+await navigation.goToAlerts()
+  })
+
+test.describe('browser windows', ()=>{
+
+test.beforeEach(async ({page}) =>{
+await page.getByText('Browser Windows').click();
+await expect(page).toHaveURL('https://demoqa.com/browser-windows');
 })
+
+test('browser windows - new tab', async ({ page }) => {
+   
+const browserWindowsPage =new BrowserWindowsPage(page)
+   
+const [newTab] = await Promise.all([
+      page.waitForEvent('popup'),
+      browserWindowsPage.newTabButton.click(),]);
     
-
-    await page.locator('.card-body')
-      .filter({ hasText: 'Alerts, Frame & Windows' })
-      .click();
+await expect(newTab.getByText('This is a sample page')).toBeVisible();
   });
 
-  test('Alerts, Frame & Windows page is opened', async ({ page }) => {
-    await expect(page).toHaveURL(/alertsWindows/);
-  });
+test('browser windows - new window', async ({ page }) => {
 
+const browserWindowsPage =new BrowserWindowsPage(page)
 
-  test('Browser Windows - New Tab', async ({ page }) => {
-    await page.getByText('Browser Windows').click();
-    await expect(page).toHaveURL('https://demoqa.com/browser-windows');
-
-    const [newTab] = await Promise.all([
+const [newWindow] = await Promise.all([
       page.waitForEvent('popup'),
-      page.locator('#tabButton').click(),
-    ]);
-
-    await expect(
-      newTab.getByText('This is a sample page')
-    ).toBeVisible();
+      browserWindowsPage.newWindowButton.click(),]);
+await expect( newWindow.getByText('This is a sample page')).toBeVisible();
   });
 
-  test('Browser Windows - New Window', async ({ page }) => {
-    await page.getByText('Browser Windows').click();
-    await expect(page).toHaveURL('https://demoqa.com/browser-windows');
+test('browser windows - new window message', async ({ page }) => {
 
-    const [newWindow] = await Promise.all([
+const browserWindowsPage =new BrowserWindowsPage(page)
+
+const [messageWindow] = await Promise.all([
       page.waitForEvent('popup'),
-      page.locator('#windowButton').click(),
-    ]);
+      browserWindowsPage.newWindowMessageButton.click(),])
 
-    await expect(
-      newWindow.getByText('This is a sample page')
-    ).toBeVisible();
-  });
+const content = await messageWindow.content()
+    expect(content).toContain('Knowledge increases by sharing but not by saving.')
+  })
+  })
+  
+test.describe('alerts', ()=>{
+test.beforeEach(async({page})=>{
 
-  test('Browser Windows - New Window Message', async ({ page }) => {
-    await page.getByText('Browser Windows').click();
-    await expect(page).toHaveURL('https://demoqa.com/browser-windows');
+await page.getByText('Alerts', { exact: true }).click();
+await expect(page).toHaveURL('https://demoqa.com/alerts');
+})
 
-    const [messageWindow] = await Promise.all([
-      page.waitForEvent('popup'),
-      page.locator('#messageWindowButton').click(),
-    ]);
+test('alerts - simple alert', async ({ page }) => {
+   
+const alerts = new AlertsPage(page)
 
-    const content = await messageWindow.content();
-    expect(content).toContain(
-      'Knowledge increases by sharing but not by saving.'
-    );
-  });
-
- 
-  test('Alerts - simple alert', async ({ page }) => {
-    await page.getByText('Alerts', { exact: true }).click();
-    await expect(page).toHaveURL('https://demoqa.com/alerts');
-
-    page.once('dialog', async dialog => {
-      //expect(dialog.type()).toBe('alert');
+page.once('dialog', async dialog => {
+      expect(dialog.type()).toBe('alert');
       expect(dialog.message()).toContain('You clicked a button');
       await dialog.accept();
     });
 
-    await page.locator('#alertButton').click();
+ await alerts.alertButton.click();
   });
 
-  test('Alerts - confirm alert (Cancel)', async ({ page }) => {
-    await page.getByText('Alerts', { exact: true }).click();
-    await expect(page).toHaveURL('https://demoqa.com/alerts');
+test('alerts - confirm alert (cancel)', async ({ page }) => {
 
-    page.once('dialog', async dialog => {
+const alerts = new AlertsPage(page)
+     
+page.once('dialog', async dialog => {
       expect(dialog.type()).toBe('confirm');
       await dialog.dismiss();
-    });
+    })
 
-    await page.locator('#confirmButton').click();
+await alerts.confirmButton.click()
 
-    await expect(
+await expect(
       page.locator('#confirmResult')
-    ).toContainText('Cancel');
+    ).toContainText('Cancel')
   });
-  test('Alerts - confirm alert (OK)', async ({ page }) => {
-    await page.getByText('Alerts', { exact: true }).click();
-    await expect(page).toHaveURL('https://demoqa.com/alerts');
 
-    page.once('dialog', async dialog => {
-      expect(dialog.type()).toBe('confirm');
-      await dialog.accept();
-    });
+test('alerts - confirm alert (OK)', async ({ page }) => {
 
-    await page.locator('#confirmButton').click();
+const alerts = new AlertsPage(page)
 
-    await expect(
+page.once('dialog', async dialog => {
+      expect(dialog.type()).toBe('confirm')
+      await dialog.accept()})
+
+await alerts.confirmButton.click()
+
+await expect( 
       page.locator('#confirmResult')
-    ).toContainText('You selected Ok');
-  });
-  test('Alerts - alert apprears after 5 seconds', async ({ page }) => {
-    await page.getByText('Alerts', { exact: true }).click();
-    await expect(page).toHaveURL('https://demoqa.com/alerts');
+    ).toContainText('You selected Ok')
+  })
 
-    page.once('dialog', async dialog => {
-      //expect(dialog.type()).toBe('alert');
-      expect(dialog.message()).toContain('This alert appeared after 5 seconds')
-      await dialog.accept();
+test('alerts - alert appears after 5 seconds', async ({ page }) => {
+
+const alerts = new AlertsPage(page)
+
+page.once('dialog', async dialog => {
+       expect(dialog.message()).toContain('This alert appeared after 5 seconds')
+ await dialog.accept()
     });
+ await alerts.timerAlertButton.click()
+  })
 
-    await page.locator('#timerAlertButton').click();
+test('alerts - prompt alert with message', async ({page})=>{
 
-    
-  });
+const alerts = new AlertsPage(page)
 
-test('alerts - promt alert with message', async ({page})=>{
-  await page.getByText('Alerts', {exact:true}).click()
-  await expect(page).toHaveURL('https://demoqa.com/alerts')
-
-
-  await Promise.all([page.waitForEvent('dialog').then(async dialog => {expect(dialog.type()).toBe('prompt');
-    await dialog.accept('Hello Anca!');
-  }),
-page.locator('#promtButton').click()]);
+await Promise.all([page.waitForEvent('dialog').then(async dialog => {expect(dialog.type()).toBe('prompt')
+await dialog.accept('Hello Anca!')
+  }), alerts.promptButton.click()])
 await expect (page.locator('#promptResult')).toContainText('Hello Anca!')
-});
+})
+})
+
+test.describe('frames', ()=> {
+
+test.beforeEach(async({page})=>{
+await page.getByText('Frames', {exact:true}).click()
+await expect(page).toHaveURL('https://demoqa.com/frames')
+})
+
 test('frames - verify text in frame1', async ({page})=> {
-  await page.getByText('Frames', {exact:true}).click()
-  await expect(page).toHaveURL('https://demoqa.com/frames')
   
- const frame = page.locator('#frame1')
- await expect(frame.getByText('This is a sample page')).toBeVisible()
+const framesPage = new FramesPage(page)
+  
+await expect(framesPage.frame1.getByText('This is a sample page')).toBeVisible()
 })
 
 test('frames - verify text in frame2', async ({page})=> {
-  await page.getByText('Frames', {exact:true}).click()
-  await expect(page).toHaveURL('https://demoqa.com/frames')
+
+const framesPage = new FramesPage(page)
   
- const frame2 = page.frameLocator('#frame2')
- await expect(frame2.getByText('This is a sample page')).toBeVisible()
+ await expect(framesPage.frame2.getByText('This is a sample page')).toBeVisible()
+})
 })
 
-test('frames - verify parent frame', async ({page})=> {
-  await page.getByText('Nested Frames').click()
-  await expect(page).toHaveURL('https://demoqa.com/nestedframes')
-  
-  const frameParent = page.frameLocator('#frame1')
- await expect(frameParent.getByText('Parent Frame')).toBeVisible()
+test.describe('nested frames', ()=>{
+test.beforeEach(async({page})=>{
+await page.getByText('Nested Frames').click()
+await expect(page).toHaveURL('https://demoqa.com/nestedframes')
 })
 
-test('frames - verify child frame', async ({page})=> {
-  await page.getByText('Nested Frames').click()
-  await expect(page).toHaveURL('https://demoqa.com/nestedframes')
+test('nested frames - verify parent frame', async ({page})=> {
+ 
+const nestedFramePage = new NestedFramesPage(page)
 
-  const frameParent = page.frameLocator('#frame1')
-  const frameChild = frameParent.frameLocator('iframe')
-
- await expect(frameChild.getByText('Child Iframe')).toBeVisible()
+await expect(nestedFramePage.frameParent.getByText('Parent Frame')).toBeVisible()
 })
+
+test('nested frames - verify child frame', async ({page})=> {
+
+const nestedFramePage = new NestedFramesPage(page)
+
+await expect(nestedFramePage.frameChild.getByText('Child Iframe')).toBeVisible()
+})
+})
+//MODAL DIALOGS
+test.describe('modal dialogs',()=>{
+
+test.beforeEach(async({page})=>{
+await page.getByText('Modal Dialogs').click();
+await expect(page).toHaveURL('https://demoqa.com/modal-dialogs'); 
+})
+
 test('Alerts - verify small modal', async ({ page }) => {
-    await page.getByText('Modal Dialogs').click();
-    await expect(page).toHaveURL('https://demoqa.com/modal-dialogs');
-    await page.getByText('Small Modal').click()
+  
+const modalDialogs = new ModalDialogsPage(page)
 
-    const smallModal = page.locator('#example-modal-sizes-title-sm')
-    const closeButton = page.locator('#closeSmallModal')
-
-    await expect(smallModal).toBeVisible()
-    await closeButton.click()
-   await expect(smallModal).not.toBeVisible()
-    
+await modalDialogs.clickSmallModal()
+await expect(modalDialogs.smallModalTitle).toBeVisible()
+await modalDialogs.clickCloseSmallModal()
+await expect(modalDialogs.smallModalTitle).not.toBeVisible()  
 })
+
 test(' modals - verify large modal ', async ({page})=> {
-  await page.getByText('Modal Dialogs').click()
-  await expect(page).toHaveURL('https://demoqa.com/modal-dialogs')
 
-  const largeModal = page.locator('#example-modal-sizes-title-lg')
-  const closeLargeButton = page.locator('#closeLargeModal')
+const modalDialogs = new ModalDialogsPage(page)
 
-  await page.getByText('Large Modal').click()
-  await expect(largeModal).toBeVisible()
-  await closeLargeButton.click()
-  await expect(largeModal).not.toBeVisible()
-
+await modalDialogs.clickLargeModal()
+await expect(modalDialogs.largeModalTitle).toBeVisible()
+await modalDialogs.clickCloseLargeModal()
+await expect(modalDialogs.largeModalTitle).not.toBeVisible()
 })
-
+})
 })
 
 
