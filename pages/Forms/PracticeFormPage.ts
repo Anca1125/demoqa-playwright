@@ -78,13 +78,13 @@ export class PracticeFormPage{
                                     await this.subjectsInput.press('Enter')
                   }
                   async selectSportsHobby() {
-                                   await this.page.getByText('Sports').click({ force: true });
+                                   await this.sportsHobby.check({ force: true });
 }
                   async selectReadingHobby() {
-                                   await this.page.getByText('Reading').click({ force: true });
+                                   await this.readingHobby.check({ force: true });
 }
                   async selectMusicHobby() {
-                                    await this.page.getByText('Music').click({ force: true });
+                                    await this.musicHobby.check({ force: true });
 }
                   async uploadPicture(filePath: string){
                                     await this.uploadPictureInput.setInputFiles(filePath)
