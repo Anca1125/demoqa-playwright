@@ -14,12 +14,10 @@ test('practice form', async ({ page }) => {
   await page.getByText('Practice Form').click();
   await expect(page).toHaveURL('https://demoqa.com/automation-practice-form');
 
- 
   // Page Object
   
   const practiceForm = new PracticeFormPage(page);
 
-  
   // Input fields (POM)
   
   await practiceForm.fillFirstName('Iliuta');
@@ -30,25 +28,21 @@ test('practice form', async ({ page }) => {
   
   await practiceForm.selectedMaleGenderLabel();
 
-  
   // Fill phone number (POM)
   
   await practiceForm.fillMobileNumber('1234567890');
   await expect(page.locator('#userNumber')).toHaveValue('1234567890');
 
-  
   // Date of birth (POM)
   
   await practiceForm.selectDateOfBirth();
   await expect(page.locator('#dateOfBirthInput')).toHaveValue('25 Nov 2010');
 
-  
   // Subjects (POM)
   
   await practiceForm.fillSubjects('Software Tester');
   await expect(page.locator('#subjectsInput')).toBeVisible();
 
-  
   // Hobbies 
   
   // DemoQA has ads / overlays that interfere with checkboxes.
@@ -61,11 +55,11 @@ test('practice form', async ({ page }) => {
   });
 
   // User-like interaction: click on labels
+
   await page.getByText('Sports').click();
   await page.getByText('Reading').click();
   await page.getByText('Music').click();
 
-  
   // Upload file (POM)
   
   await practiceForm.uploadPicture(
@@ -73,27 +67,21 @@ test('practice form', async ({ page }) => {
   );
   await expect(page.locator('#uploadPicture')).toHaveValue(/pisica\.jpg$/);
 
-
   // Current address
   
-  await practiceForm.fillCurrentAddress('Botosani, Romania')
+ await practiceForm.fillCurrentAddress('Botosani, Romania')
  await expect(page.getByPlaceholder('Current Address')).toHaveValue(('Botosani, Romania'))
-
   
   // State & City
   
-
   await practiceForm.selectState('NCR')
   await practiceForm.selectCity('Delhi')
   await expect(page.locator('#state')).toContainText('NCR');
   await expect(page.locator('#city')).toContainText('Delhi');
-
  
   // Submit
   
   await practiceForm.submitForm()
-  
-
   
   // Modal validation (FINAL ASSERTIONS)
   

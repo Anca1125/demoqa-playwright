@@ -32,6 +32,20 @@ This is a **learning project**, not a production-ready automation suite.
 
 ---
 
+## 🛠 Code Structure & Refactoring
+
+The test code evolved during the learning process.
+Initial implementations were intentionally kept simple,
+then gradually refactored to improve clarity and maintainability.
+
+Refactoring focused on:
+
+- introducing the Page Object Model where it adds value
+- keeping assertions inside test files
+- avoiding over-engineering while learning new concepts
+
+---
+
 ## 🧪 Tested Sections
 
 ### Elements
@@ -123,7 +137,7 @@ npm install
 ```
 
 2. Run Playwright tests
-   
+
    npx playwright test
 
 > Make sure Node.js is installed before running the commands above.
